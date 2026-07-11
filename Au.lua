@@ -1,12 +1,11 @@
 -- ============================================
--- ПЕРЕВОДЧИК (Компактная версия)
+-- ПЕРЕВОДЧИК (Исправленная версия)
 -- ============================================
 
 local Players = game:GetService("Players")
 local HttpService = game:GetService("HttpService")
 local CoreGui = game:GetService("CoreGui")
 local UserInputService = game:GetService("UserInputService")
-local LocalPlayer = Players.LocalPlayer
 
 -- Создаём GUI
 local screenGui = Instance.new("ScreenGui")
@@ -15,7 +14,7 @@ screenGui.ResetOnSpawn = false
 screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 screenGui.Parent = CoreGui
 
--- Главное окно (уменьшено)
+-- Главное окно
 local mainFrame = Instance.new("Frame")
 mainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
 mainFrame.BackgroundTransparency = 0.1
@@ -29,7 +28,7 @@ corner.CornerRadius = UDim.new(0, 10)
 corner.Parent = mainFrame
 
 -- ============================================
--- 1. ПЕРЕТАСКИВАНИЕ
+-- 1. ПЕРЕТАСКИВАНИЕ (ИСПРАВЛЕНО)
 -- ============================================
 local dragging = false
 local dragInput = nil
@@ -59,7 +58,7 @@ title.Size = UDim2.new(1, -30, 0, 22)
 title.TextXAlignment = Enum.TextXAlignment.Left
 title.Parent = titleBar
 
--- Перетаскивание
+-- Перетаскивание через заголовок
 titleBar.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 then
         dragging = true
@@ -93,14 +92,14 @@ titleBar.InputEnded:Connect(function(input)
 end)
 
 -- ============================================
--- 2. ИЗМЕНЕНИЕ РАЗМЕРА
+-- 2. ИЗМЕНЕНИЕ РАЗМЕРА (ИСПРАВЛЕНО)
 -- ============================================
 local resizeHandle = Instance.new("Frame")
 resizeHandle.BackgroundColor3 = Color3.fromRGB(100, 100, 120)
 resizeHandle.BackgroundTransparency = 0.5
 resizeHandle.BorderSizePixel = 0
-resizeHandle.Position = UDim2.new(1, -12, 1, -12)
-resizeHandle.Size = UDim2.new(0, 12, 0, 12)
+resizeHandle.Position = UDim2.new(1, -15, 1, -15)
+resizeHandle.Size = UDim2.new(0, 15, 0, 15)
 resizeHandle.Parent = mainFrame
 
 local resizeCorner = Instance.new("UICorner")
@@ -122,12 +121,14 @@ resizeIcon.Parent = resizeHandle
 local isResizing = false
 local resizeStart = nil
 local startSize = nil
+local startPosResize = nil
 
 resizeHandle.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 then
         isResizing = true
         resizeStart = input.Position
         startSize = mainFrame.Size
+        startPosResize = mainFrame.Position
     end
 end)
 
@@ -143,7 +144,7 @@ UserInputService.InputChanged:Connect(function(input)
         local newWidth = math.max(320, startSize.X.Offset + delta.X)
         local newHeight = math.max(220, startSize.Y.Offset + delta.Y)
         mainFrame.Size = UDim2.new(0, newWidth, 0, newHeight)
-        resultLabel.Size = UDim2.new(1, -30, 0, math.max(50, newHeight - 190))
+        resultLabel.Size = UDim2.new(1, -24, 0, math.max(50, newHeight - 190))
     end
 end)
 
@@ -196,7 +197,7 @@ inputCorner.CornerRadius = UDim.new(0, 6)
 inputCorner.Parent = inputBox
 
 -- ============================================
--- 5. ВЫБОР ЯЗЫКА (компактный)
+-- 5. ВЫБОР ЯЗЫКА
 -- ============================================
 local langLabel = Instance.new("TextLabel")
 langLabel.BackgroundTransparency = 1
@@ -278,7 +279,7 @@ dropdown.MouseButton1Click:Connect(function()
 end)
 
 -- ============================================
--- 6. КНОПКИ ПЕРЕВОДА И КОПИРОВАНИЯ (рядом)
+-- 6. КНОПКИ
 -- ============================================
 local translateBtn = Instance.new("TextButton")
 translateBtn.BackgroundColor3 = Color3.fromRGB(0, 150, 255)
@@ -329,16 +330,17 @@ resultCorner.CornerRadius = UDim.new(0, 6)
 resultCorner.Parent = resultLabel
 
 -- ============================================
--- 8. ФУНКЦИЯ КОПИРОВАНИЯ
+-- 8. ФУНКЦИЯ КОПИРОВАНИЯ (ТОЛЬКО ПЕРЕВОД)
 -- ============================================
 local function CopyToClipboard(text)
-    if text == "" or text == "Перевод..." then
+    -- Убираем все эмодзи и префиксы (✅, ❌, ⚠️, ⏳)
+    local cleanText = text:gsub("^[✅❌⚠️⏳]? ?", "")
+    
+    if cleanText == "" or cleanText == "Перевод..." then
         copyBtn.Text = "⚠️ Нет текста"
         task.delay(1.2, function() copyBtn.Text = "📋 Копировать" end)
         return
     end
-    
-    local cleanText = text:gsub("^[✅❌⚠️⏳]? ?", "")
     
     if setclipboard then
         setclipboard(cleanText)
@@ -406,4 +408,4 @@ inputBox.FocusLost:Connect(function(enterPressed)
     end
 end)
 
-print("✅ Компактный переводчик загружен!")
+print("✅ Переводчик загружен! Перетаскивай за заголовок, меняй размер за угол.")
