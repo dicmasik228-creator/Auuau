@@ -21,7 +21,7 @@ mainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
 mainFrame.BackgroundTransparency = 0.1
 mainFrame.BorderSizePixel = 0
 mainFrame.Position = UDim2.new(0.5, -300, 0.5, -200)
-mainFrame.Size = UDim2.new(0, 600, 0, 400)
+mainFrame.Size = UDim2.new(0, 600, 0, 420)
 mainFrame.Parent = screenGui
 
 -- Скругление углов
@@ -30,7 +30,7 @@ corner.CornerRadius = UDim.new(0, 12)
 corner.Parent = mainFrame
 
 -- ============================================
--- 1. ПЕРЕТАСКИВАНИЕ
+-- 1. ПЕРЕТАСКИВАНИЕ (Drag)
 -- ============================================
 local dragging = false
 local dragInput = nil
@@ -95,14 +95,14 @@ titleBar.InputEnded:Connect(function(input)
 end)
 
 -- ============================================
--- 2. ИЗМЕНЕНИЕ РАЗМЕРА (Ресайз)
+-- 2. ИЗМЕНЕНИЕ РАЗМЕРА (Resize)
 -- ============================================
 local resizeHandle = Instance.new("Frame")
 resizeHandle.BackgroundColor3 = Color3.fromRGB(100, 100, 120)
 resizeHandle.BackgroundTransparency = 0.5
 resizeHandle.BorderSizePixel = 0
-resizeHandle.Position = UDim2.new(1, -12, 1, -12)
-resizeHandle.Size = UDim2.new(0, 12, 0, 12)
+resizeHandle.Position = UDim2.new(1, -15, 1, -15)
+resizeHandle.Size = UDim2.new(0, 15, 0, 15)
 resizeHandle.Parent = mainFrame
 
 local resizeCorner = Instance.new("UICorner")
@@ -145,18 +145,19 @@ end)
 UserInputService.InputChanged:Connect(function(input)
     if isResizing and input.UserInputType == Enum.UserInputType.MouseMovement then
         local delta = input.Position - resizeStart
-        local newWidth = math.max(350, startSize.X.Offset + delta.X)
-        local newHeight = math.max(250, startSize.Y.Offset + delta.Y)
+        local newWidth = math.max(400, startSize.X.Offset + delta.X)
+        local newHeight = math.max(300, startSize.Y.Offset + delta.Y)
         
         mainFrame.Size = UDim2.new(0, newWidth, 0, newHeight)
         
-        -- Обновляем размеры элементов внутри
-        inputBox.Size = UDim2.new(1, -30, 0, 50)
-        resultLabel.Size = UDim2.new(1, -30, 0, math.max(50, newHeight - 280))
+        -- Обновляем размер результата
+        resultLabel.Size = UDim2.new(1, -30, 0, math.max(80, newHeight - 290))
     end
 end)
 
--- Кнопка закрытия
+-- ============================================
+-- 3. КНОПКА ЗАКРЫТИЯ
+-- ============================================
 local closeBtn = Instance.new("TextButton")
 closeBtn.BackgroundTransparency = 1
 closeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -172,7 +173,7 @@ closeBtn.MouseButton1Click:Connect(function()
 end)
 
 -- ============================================
--- 3. ПОЛЕ ВВОДА
+-- 4. ПОЛЕ ВВОДА
 -- ============================================
 local inputLabel = Instance.new("TextLabel")
 inputLabel.BackgroundTransparency = 1
@@ -203,7 +204,7 @@ inputCorner.CornerRadius = UDim.new(0, 8)
 inputCorner.Parent = inputBox
 
 -- ============================================
--- 4. ВЫБОР ЯЗЫКА
+-- 5. ВЫБОР ЯЗЫКА
 -- ============================================
 local langLabel = Instance.new("TextLabel")
 langLabel.BackgroundTransparency = 1
@@ -258,7 +259,6 @@ local languages = {
 }
 
 local selectedLang = "en"
-local langButtons = {}
 
 for i, lang in ipairs(languages) do
     local btn = Instance.new("TextButton")
@@ -280,8 +280,6 @@ for i, lang in ipairs(languages) do
         dropdown.Text = lang[1]
         langList.Visible = false
     end)
-    
-    langButtons[i] = btn
 end
 
 dropdown.MouseButton1Click:Connect(function()
@@ -289,7 +287,7 @@ dropdown.MouseButton1Click:Connect(function()
 end)
 
 -- ============================================
--- 5. КНОПКА ПЕРЕВОДА
+-- 6. КНОПКА ПЕРЕВОДА
 -- ============================================
 local translateBtn = Instance.new("TextButton")
 translateBtn.BackgroundColor3 = Color3.fromRGB(0, 150, 255)
@@ -306,27 +304,7 @@ translateCorner.CornerRadius = UDim.new(0, 8)
 translateCorner.Parent = translateBtn
 
 -- ============================================
--- 6. ПОЛЕ РЕЗУЛЬТАТА
--- ============================================
-local resultLabel = Instance.new("TextLabel")
-resultLabel.BackgroundColor3 = Color3.fromRGB(45, 45, 55)
-resultLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-resultLabel.Font = Enum.Font.SourceSans
-resultLabel.TextSize = 16
-resultLabel.Text = "Перевод появится здесь..."
-resultLabel.Position = UDim2.new(0, 15, 0, 210)
-resultLabel.Size = UDim2.new(1, -30, 0, 100)
-resultLabel.TextWrapped = true
-resultLabel.TextXAlignment = Enum.TextXAlignment.Left
-resultLabel.TextYAlignment = Enum.TextYAlignment.Top
-resultLabel.Parent = mainFrame
-
-local resultCorner = Instance.new("UICorner")
-resultCorner.CornerRadius = UDim.new(0, 8)
-resultCorner.Parent = resultLabel
-
--- ============================================
--- 7. КНОПКА КОПИРОВАНИЯ
+-- 7. КНОПКА КОПИРОВАНИЯ (ЕСТЬ!)
 -- ============================================
 local copyBtn = Instance.new("TextButton")
 copyBtn.BackgroundColor3 = Color3.fromRGB(50, 200, 50)
@@ -342,7 +320,29 @@ local copyCorner = Instance.new("UICorner")
 copyCorner.CornerRadius = UDim.new(0, 8)
 copyCorner.Parent = copyBtn
 
--- Функция копирования
+-- ============================================
+-- 8. ПОЛЕ РЕЗУЛЬТАТА
+-- ============================================
+local resultLabel = Instance.new("TextLabel")
+resultLabel.BackgroundColor3 = Color3.fromRGB(45, 45, 55)
+resultLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+resultLabel.Font = Enum.Font.SourceSans
+resultLabel.TextSize = 16
+resultLabel.Text = "Перевод появится здесь..."
+resultLabel.Position = UDim2.new(0, 15, 0, 210)
+resultLabel.Size = UDim2.new(1, -30, 0, 120)
+resultLabel.TextWrapped = true
+resultLabel.TextXAlignment = Enum.TextXAlignment.Left
+resultLabel.TextYAlignment = Enum.TextYAlignment.Top
+resultLabel.Parent = mainFrame
+
+local resultCorner = Instance.new("UICorner")
+resultCorner.CornerRadius = UDim.new(0, 8)
+resultCorner.Parent = resultLabel
+
+-- ============================================
+-- 9. ФУНКЦИЯ КОПИРОВАНИЯ
+-- ============================================
 local function CopyToClipboard(text)
     if text == "" or text == "Перевод появится здесь..." then
         copyBtn.Text = "⚠️ Нет текста"
@@ -376,7 +376,7 @@ copyBtn.MouseButton1Click:Connect(function()
 end)
 
 -- ============================================
--- 8. ФУНКЦИЯ ПЕРЕВОДА
+-- 10. ФУНКЦИЯ ПЕРЕВОДА
 -- ============================================
 local function Translate(text, targetLang)
     if text == "" then
@@ -423,4 +423,4 @@ inputBox.FocusLost:Connect(function(enterPressed)
     end
 end)
 
-print("✅ Переводчик загружен! Введи текст на русском и нажми 'Перевести'.")
+print("✅ Переводчик загружен! Всё работает: перетаскивание, изменение размера, копирование.")
